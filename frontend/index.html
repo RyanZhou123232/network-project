@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Networker</title>
+    <link rel="stylesheet" href="src/css/style.css" />
+  </head>
+  <body>
+    <main class="stage isIntro isAuthPending" aria-label="Scattered glass buttons">
+      <canvas class="fluidBackground" id="fluidBackground" aria-hidden="true"></canvas>
+
+      <div class="introSplash" aria-hidden="true">
+        <span class="introText">NETWORK SEQUENCE 01</span>
+      </div>
+
+      <form class="loginPanel" aria-label="Login">
+        <p class="authMessage" id="authMessage" hidden></p>
+        <span class="authView authSignIn">
+          <span class="loginKicker">Network Access</span>
+          <span class="loginTitle">Sign in</span>
+          <label>
+            <span>Email</span>
+            <input type="email" name="username" autocomplete="username" required />
+          </label>
+          <label>
+            <span>Password</span>
+            <input type="password" name="password" autocomplete="current-password" />
+          </label>
+          <button type="submit" class="loginSubmit">Log in</button>
+          <button type="button" class="authGhostButton signUpToggle">Sign Up</button>
+        </span>
+
+        <span class="authView authSignUp" aria-hidden="true">
+          <span class="loginKicker">Create Access</span>
+          <span class="loginTitle">Sign up</span>
+          <label>
+            <span>Display name</span>
+            <input type="text" name="signupUsername" autocomplete="nickname" required />
+          </label>
+          <label>
+            <span>Email</span>
+            <input type="email" name="signupEmail" autocomplete="email" required />
+          </label>
+          <label>
+            <span>Password</span>
+            <input type="password" name="signupPassword" autocomplete="new-password" />
+          </label>
+          <label>
+            <span>Confirm Password</span>
+            <input type="password" name="signupConfirmPassword" autocomplete="new-password" />
+          </label>
+          <button type="button" class="loginSubmit signUpSubmit">Create Account</button>
+          <button type="button" class="authGhostButton signInToggle">Back to Sign in</button>
+        </span>
+      </form>
+
+      <div class="scatterLayer" id="buttonField"></div>
+
+      <div class="sortControl" id="sortControl">
+        <span>SORT BY:</span>
+        <span class="sortSelect">
+          <button type="button" class="sortButton" aria-label="Sort by" aria-expanded="false" aria-controls="sortMenu">
+            <span class="sortValue">Interactions</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m7 10 5 5 5-5" />
+            </svg>
+          </button>
+          <span class="sortMenu" id="sortMenu" role="listbox" aria-label="Sort by">
+            <button type="button" class="sortOption isSelected" role="option" aria-selected="true" data-sort-value="Interactions">Interactions</button>
+            <button type="button" class="sortOption" role="option" aria-selected="false" data-sort-value="Alphabetical">Alphabetical</button>
+            <button type="button" class="sortOption" role="option" aria-selected="false" data-sort-value="Random">Random</button>
+            <button type="button" class="sortOption" role="option" aria-selected="false" data-sort-value="Career Alignment">Career Alignment</button>
+          </span>
+        </span>
+      </div>
+
+      <div class="filterControl" id="filterControl">
+        <button type="button" class="filterToggle" aria-label="Open filter" aria-expanded="false" aria-controls="filterOptions">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 5h18" />
+            <path d="M7 12h10" />
+            <path d="M10 19h4" />
+          </svg>
+        </button>
+        <div class="filterDropdown" id="filterOptions">
+          <span>FILTER:</span>
+          <div class="filterChecks" role="group" aria-label="Filter by">
+            <label class="filterCheck">
+              <input type="checkbox" name="filter" value="school" />
+              <span class="checkVisual" aria-hidden="true"></span>
+              <span>Your School</span>
+            </label>
+            <label class="filterCheck">
+              <input type="checkbox" name="filter" value="company" />
+              <span class="checkVisual" aria-hidden="true"></span>
+              <span>Your Company</span>
+            </label>
+            <label class="filterCheck">
+              <input type="checkbox" name="filter" value="career" />
+              <span class="checkVisual" aria-hidden="true"></span>
+              <span>Your Career Area</span>
+            </label>
+          </div>
+          <button type="button" class="filterClose" aria-label="Close filter">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="quickActions" aria-label="Quick actions">
+        <button type="button" class="addConnectionToggle" aria-label="Add connection" aria-expanded="false" aria-controls="addConnectionPanel">+</button>
+        <button type="button" aria-label="Filter B">B</button>
+        <button type="button" class="settingsToggle" aria-label="Open settings" aria-expanded="false" aria-controls="settingsPanel">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 15.4a3.4 3.4 0 1 0 0-6.8 3.4 3.4 0 0 0 0 6.8z" />
+            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.05.05a2.05 2.05 0 0 1-2.9 2.9l-.05-.05A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .58V20a2 2 0 0 1-4 0v-.02a1.7 1.7 0 0 0-1-.58 1.7 1.7 0 0 0-1.88.34l-.05.05a2.05 2.05 0 0 1-2.9-2.9l.05-.05A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.58-1H4a2 2 0 0 1 0-4h.02a1.7 1.7 0 0 0 .58-1 1.7 1.7 0 0 0-.34-1.88l-.05-.05a2.05 2.05 0 0 1 2.9-2.9l.05.05A1.7 1.7 0 0 0 9 4.6c.38-.14.72-.34 1-.58V4a2 2 0 0 1 4 0v.02c.28.24.62.44 1 .58a1.7 1.7 0 0 0 1.88-.34l.05-.05a2.05 2.05 0 0 1 2.9 2.9l-.05.05A1.7 1.7 0 0 0 19.4 9c.14.38.34.72.58 1H20a2 2 0 0 1 0 4h-.02c-.24.28-.44.62-.58 1z" />
+          </svg>
+        </button>
+        <button type="button" class="debugToggle" aria-label="Open debug tools" aria-expanded="false" aria-controls="debugPanel">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 8.6A4 4 0 0 1 12 5a4 4 0 0 1 4 3.6" />
+            <path d="M8 11h8" />
+            <path d="M8 14h8" />
+            <path d="M12 5V3" />
+            <path d="m9.2 5.6-1.4-1.4" />
+            <path d="m14.8 5.6 1.4-1.4" />
+            <path d="M6.4 10H4.5" />
+            <path d="M17.6 10h1.9" />
+            <path d="M6.4 15H4.5" />
+            <path d="M17.6 15h1.9" />
+            <path d="M8 8.5v5.7a4 4 0 0 0 8 0V8.5" />
+            <path d="M9.2 18.3 7.8 20" />
+            <path d="m14.8 18.3 1.4 1.7" />
+          </svg>
+        </button>
+      </div>
+
+      <form class="addConnectionPanel" id="addConnectionPanel" aria-label="Add connections">
+        <span>Add Connections</span>
+        <label>
+          <span>User ID</span>
+          <input type="text" name="userId" autocomplete="off" />
+        </label>
+        <button type="submit">Add</button>
+        <section class="friendRequests" aria-label="New friend requests">
+          <span>New Friend Requests</span>
+          <div class="friendRequestList" id="friendRequestList"></div>
+        </section>
+      </form>
+
+      <form class="debugPanel" id="debugPanel" aria-label="Debug add friend">
+        <span>Debug</span>
+        <label>
+          <span>Name</span>
+          <input type="text" name="name" autocomplete="off" required />
+        </label>
+        <label>
+          <span>Bio</span>
+          <textarea name="bio" rows="3" required></textarea>
+        </label>
+        <label>
+          <span>School</span>
+          <input type="text" name="university" autocomplete="off" required />
+        </label>
+        <label>
+          <span>Company</span>
+          <input type="text" name="company" autocomplete="off" required />
+        </label>
+        <label>
+          <span>Industry Interest</span>
+          <input type="text" name="industryInterest" autocomplete="off" required />
+        </label>
+        <label>
+          <span>Interaction Frequency</span>
+          <input type="number" name="interactionFrequency" min="0" max="100" step="1" value="70" required />
+        </label>
+        <button type="submit">Add Bubble</button>
+      </form>
+
+      <button type="button" class="settingsScrim" aria-label="Close settings"></button>
+      <section class="settingsPanel" id="settingsPanel" aria-label="Settings" aria-modal="true">
+        <aside class="settingsSidebar" aria-label="Settings sections">
+          <span>Settings</span>
+          <button type="button" class="isSelected" data-settings-tab="general">General</button>
+          <button type="button" data-settings-tab="network">Network</button>
+          <button type="button" data-settings-tab="appearance">Appearance</button>
+          <button type="button" data-settings-tab="privacy">Privacy</button>
+          <div class="settingsSidebarSection">
+            <button type="button" data-settings-tab="signout">Sign out</button>
+          </div>
+        </aside>
+        <div class="settingsContent">
+          <section class="settingsPage isActive" data-settings-panel="general">
+            <span class="settingsKicker">Workspace</span>
+            <span class="settingsTitle">General</span>
+            <div class="settingsRows">
+              <label class="settingsRow settingsToggleRow">
+                <span>
+                  <span>Bubble motion</span>
+                  <span>Allow bubbles to drift subtly while browsing.</span>
+                </span>
+                <input type="checkbox" checked />
+                <span class="settingsSwitch" aria-hidden="true"></span>
+              </label>
+              <label class="settingsRow settingsCheckboxRow">
+                <input type="checkbox" checked />
+                <span class="settingsCheckbox" aria-hidden="true"></span>
+                <span>
+                  <span>Show profile previews</span>
+                  <span>Display short profile cards after selecting a bubble.</span>
+                </span>
+              </label>
+              <label class="settingsRow settingsSliderRow">
+                <span>
+                  <span>Motion intensity</span>
+                  <span>Placeholder control for future animation tuning.</span>
+                </span>
+                <input type="range" min="0" max="100" value="42" />
+              </label>
+            </div>
+          </section>
+
+          <section class="settingsPage" data-settings-panel="network">
+            <span class="settingsKicker">Connections</span>
+            <span class="settingsTitle">Network</span>
+            <div class="settingsRows">
+              <label class="settingsRow settingsToggleRow">
+                <span>
+                  <span>Smart recommendations</span>
+                  <span>Placeholder for suggested connections based on profile signals.</span>
+                </span>
+                <input type="checkbox" checked />
+                <span class="settingsSwitch" aria-hidden="true"></span>
+              </label>
+              <label class="settingsRow settingsCheckboxRow">
+                <input type="checkbox" />
+                <span class="settingsCheckbox" aria-hidden="true"></span>
+                <span>
+                  <span>Prioritize school network</span>
+                  <span>Place shared-school connections nearer to the center.</span>
+                </span>
+              </label>
+              <label class="settingsRow settingsSliderRow">
+                <span>
+                  <span>Discovery radius</span>
+                  <span>Placeholder control for how broad the network map feels.</span>
+                </span>
+                <input type="range" min="0" max="100" value="68" />
+              </label>
+            </div>
+          </section>
+
+          <section class="settingsPage" data-settings-panel="appearance">
+            <span class="settingsKicker">Interface</span>
+            <span class="settingsTitle">Appearance</span>
+            <div class="settingsRows">
+              <label class="settingsRow settingsToggleRow">
+                <span>
+                  <span>Glass highlights</span>
+                  <span>Placeholder for adjusting card and bubble reflections.</span>
+                </span>
+                <input type="checkbox" checked />
+                <span class="settingsSwitch" aria-hidden="true"></span>
+              </label>
+              <label class="settingsRow settingsSliderRow">
+                <span>
+                  <span>Background contrast</span>
+                  <span>Placeholder control for the animated background depth.</span>
+                </span>
+                <input type="range" min="0" max="100" value="56" />
+              </label>
+              <label class="settingsRow settingsCheckboxRow">
+                <input type="checkbox" checked />
+                <span class="settingsCheckbox" aria-hidden="true"></span>
+                <span>
+                  <span>Compact controls</span>
+                  <span>Keep top controls small and close to the viewport edge.</span>
+                </span>
+              </label>
+            </div>
+          </section>
+
+          <section class="settingsPage" data-settings-panel="privacy">
+            <span class="settingsKicker">Visibility</span>
+            <span class="settingsTitle">Privacy</span>
+            <div class="settingsRows">
+              <label class="settingsRow settingsToggleRow">
+                <span>
+                  <span>Profile visibility</span>
+                  <span>Placeholder for showing your profile to nearby connections.</span>
+                </span>
+                <input type="checkbox" checked />
+                <span class="settingsSwitch" aria-hidden="true"></span>
+              </label>
+              <label class="settingsRow settingsCheckboxRow">
+                <input type="checkbox" />
+                <span class="settingsCheckbox" aria-hidden="true"></span>
+                <span>
+                  <span>Hide interaction score</span>
+                  <span>Keep interaction frequency internal only.</span>
+                </span>
+              </label>
+              <label class="settingsRow settingsToggleRow">
+                <span>
+                  <span>Allow debug profiles</span>
+                  <span>Placeholder for enabling temporary test profiles.</span>
+                </span>
+                <input type="checkbox" />
+                <span class="settingsSwitch" aria-hidden="true"></span>
+              </label>
+            </div>
+          </section>
+
+          <section class="settingsPage settingsSignOutPage" data-settings-panel="signout">
+            <span class="settingsKicker">Session</span>
+            <span class="settingsTitle">Sign out</span>
+            <div class="settingsRows">
+              <div class="settingsRow settingsSignOutRow">
+                <span>
+                  <span>Return to Sign in</span>
+                  <span>This demo will clear the current canvas state and show the Sign in card again.</span>
+                </span>
+                <button type="button" class="settingsSignOut">Sign out</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <form class="searchBar" role="search">
+        <input type="search" aria-label="Search" placeholder="Search" />
+        <button type="submit" aria-label="Submit search">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+        </button>
+      </form>
+
+      <button type="button" class="myProfileToggle" aria-label="Open my profile" aria-expanded="false" aria-controls="myProfileCard">ME</button>
+
+      <form class="myProfileCard" id="myProfileCard" aria-label="Edit my profile">
+        <button type="button" class="myProfileClose" aria-label="Close my profile">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+        <span class="myProfileKicker">My Profile</span>
+        <span class="myProfileTitle">Tiger Pan</span>
+        <label>
+          <span>School</span>
+          <input type="text" name="school" value="The University of Chicago" />
+        </label>
+        <label>
+          <span>Work Experience</span>
+          <input type="text" name="work" value="Product Intern at Northstar Labs" />
+        </label>
+        <div class="myProfileField myProfileInterestField">
+          <span class="myProfileFieldLabel">Industry Interest</span>
+          <div class="profileInterestGrid">
+            <span class="profileDropdown" data-profile-dropdown="category">
+              <button type="button" class="profileDropdownButton" aria-label="Industry category" aria-expanded="false">
+                <span class="profileDropdownValue">Technology</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m7 10 5 5 5-5" />
+                </svg>
+              </button>
+              <span class="profileDropdownMenu" role="listbox" aria-label="Industry category"></span>
+            </span>
+            <span class="profileDropdown" data-profile-dropdown="specialty">
+              <button type="button" class="profileDropdownButton" aria-label="Technology specialty" aria-expanded="false">
+                <span class="profileDropdownValue">Full Stack Engineering</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m7 10 5 5 5-5" />
+                </svg>
+              </button>
+              <span class="profileDropdownMenu" role="listbox" aria-label="Technology specialty"></span>
+            </span>
+          </div>
+          <input type="hidden" name="industryCategory" value="Technology" />
+          <input type="hidden" name="industrySpecialty" value="Full Stack Engineering" />
+        </div>
+        <label>
+          <span>Bio</span>
+          <textarea name="bio" rows="4">Building a lightweight network map for school, work, and career-aligned introductions.</textarea>
+        </label>
+        <button type="submit" class="myProfileSave">Save</button>
+      </form>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="src/js/api.js"></script>
+    <script src="src/js/app.js"></script>
+  </body>
+</html>
