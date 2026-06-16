@@ -4,6 +4,7 @@ const fluidCanvas = document.querySelector("#fluidBackground");
 const field = document.querySelector("#buttonField");
 const introSplash = document.querySelector(".introSplash");
 const introText = document.querySelector(".introText");
+const introProgressLine = document.querySelector(".introProgressLine");
 const loginPanel = document.querySelector(".loginPanel");
 const signUpToggle = loginPanel.querySelector(".signUpToggle");
 const signInToggle = loginPanel.querySelector(".signInToggle");
@@ -2048,22 +2049,32 @@ if (fluidBackground) {
   window.addEventListener("resize", fluidBackground.resize);
 }
 
-window.setTimeout(
-  async () => {
-    stage.classList.remove("isIntro");
-    introSplash.hidden = true;
+let introFinished = false;
+const finishIntro = async () => {
+  if (introFinished) {
+    return;
+  }
 
-    const session = await NetworkAPI.getSession();
+  introFinished = true;
+  stage.classList.remove("isIntro");
+  introSplash.hidden = true;
 
-    if (session) {
-      await launchApp();
-      return;
-    }
+  const session = await NetworkAPI.getSession();
 
-    loginPanel.querySelector("input")?.focus();
-  },
-  prefersReducedMotion ? 250 : 2350,
-);
+  if (session) {
+    await launchApp();
+    return;
+  }
+
+  loginPanel.querySelector("input")?.focus();
+};
+
+if (prefersReducedMotion) {
+  window.setTimeout(finishIntro, 300);
+} else {
+  introProgressLine?.addEventListener("animationend", finishIntro, { once: true });
+  window.setTimeout(finishIntro, 4600);
+}
 
 const stopPanning = (event) => {
   if (!isDragging) {
