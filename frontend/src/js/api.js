@@ -93,6 +93,12 @@
       return client.rpc("send_connection_request", { target_id: targetId });
     },
 
+    async sendConnectionRequestByEmail(email) {
+      return client.rpc("send_connection_request_by_email", {
+        target_email: email.trim(),
+      });
+    },
+
     async respondConnectionRequest(connectionId, status) {
       return client.rpc("respond_connection_request", {
         connection_id: connectionId,

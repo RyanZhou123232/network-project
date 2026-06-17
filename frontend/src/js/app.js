@@ -12,6 +12,20 @@ const signUpSubmit = loginPanel.querySelector(".signUpSubmit");
 const authSignIn = loginPanel.querySelector(".authSignIn");
 const authSignUp = loginPanel.querySelector(".authSignUp");
 const authMessage = document.getElementById("authMessage");
+const getAuthMessageHeight = () => {
+  if (authMessage.hidden) {
+    return 0;
+  }
+
+  const styles = getComputedStyle(authMessage);
+  return authMessage.offsetHeight + (parseFloat(styles.marginBottom) || 0);
+};
+const updateAuthPanelHeight = () => {
+  const activeView = loginPanel.classList.contains("isSignUp") ? authSignUp : authSignIn;
+  const contentHeight = activeView.offsetHeight + getAuthMessageHeight();
+
+  loginPanel.style.setProperty("--auth-height", `${contentHeight}px`);
+};
 const friendRequestList = document.getElementById("friendRequestList");
 const centerSize = 132;
 const minSize = 58;
@@ -240,7 +254,7 @@ const filterToggle = filterControl.querySelector(".filterToggle");
 const filterClose = filterControl.querySelector(".filterClose");
 const addConnectionToggle = document.querySelector(".addConnectionToggle");
 const addConnectionPanel = document.querySelector("#addConnectionPanel");
-const addConnectionInput = addConnectionPanel.querySelector("input[name='userId']");
+const addConnectionInput = addConnectionPanel.querySelector("input[name='connectionEmail']");
 const debugToggle = document.querySelector(".debugToggle");
 const debugPanel = document.querySelector("#debugPanel");
 const settingsToggle = document.querySelector(".settingsToggle");
@@ -1020,6 +1034,7 @@ const showAuthMessage = (text, isError = false) => {
   if (!text) {
     authMessage.hidden = true;
     authMessage.textContent = "";
+    updateAuthPanelHeight();
     return;
   }
 
@@ -1027,6 +1042,7 @@ const showAuthMessage = (text, isError = false) => {
   authMessage.textContent = text;
   authMessage.classList.toggle("isError", isError);
   authMessage.classList.toggle("isSuccess", !isError);
+  requestAnimationFrame(updateAuthPanelHeight);
 };
 const renderFriendRequests = async () => {
   friendRequestList.replaceChildren();
@@ -1198,13 +1214,13 @@ addConnectionToggle.addEventListener("click", () => {
 });
 addConnectionPanel.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const targetId = addConnectionInput.value.trim();
+  const email = addConnectionInput.value.trim();
 
-  if (!targetId) {
+  if (!email) {
     return;
   }
 
-  const { error } = await NetworkAPI.sendConnectionRequest(targetId);
+  const { error } = await NetworkAPI.sendConnectionRequestByEmail(email);
 
   if (error) {
     alert(error.message);
@@ -1901,11 +1917,6 @@ loginPanel.addEventListener("submit", async (event) => {
 
   await launchApp();
 });
-const updateAuthPanelHeight = () => {
-  const activeView = loginPanel.classList.contains("isSignUp") ? authSignUp : authSignIn;
-
-  loginPanel.style.setProperty("--auth-height", `${activeView.scrollHeight}px`);
-};
 const setAuthMode = (mode) => {
   const isSignUp = mode === "signup";
 

@@ -13,8 +13,14 @@
       <div class="introSplash" aria-hidden="true">
         <div class="introStack">
           <span class="introText">NETWORK SEQUENCE 01</span>
-          <div class="introProgress" aria-hidden="true">
-            <span class="introProgressLine"></span>
+          <div class="introProgressGroup">
+            <div class="introProgress" aria-hidden="true">
+              <span class="introProgressLine"></span>
+            </div>
+            <div class="introCaption" aria-hidden="true">
+              <span class="introLoadingText">SYSTEM LOADING......</span>
+              <span class="introTagline">be ready for the next era</span>
+            </div>
           </div>
         </div>
       </div>
@@ -165,8 +171,8 @@
       <form class="addConnectionPanel" id="addConnectionPanel" aria-label="Add connections">
         <span>Add Connections</span>
         <label>
-          <span>User ID</span>
-          <input type="text" name="userId" autocomplete="off" />
+          <span>Email</span>
+          <input type="email" name="connectionEmail" autocomplete="email" placeholder="friend@example.com" required />
         </label>
         <button type="submit">Add</button>
         <section class="friendRequests" aria-label="New friend requests">
