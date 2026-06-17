@@ -255,6 +255,7 @@ const filterClose = filterControl.querySelector(".filterClose");
 const addConnectionToggle = document.querySelector(".addConnectionToggle");
 const addConnectionPanel = document.querySelector("#addConnectionPanel");
 const addConnectionInput = addConnectionPanel.querySelector("input[name='connectionEmail']");
+const addConnectionMessage = document.getElementById("addConnectionMessage");
 const debugToggle = document.querySelector(".debugToggle");
 const debugPanel = document.querySelector("#debugPanel");
 const settingsToggle = document.querySelector(".settingsToggle");
@@ -1100,6 +1101,20 @@ const renderFriendRequests = async () => {
 const closeAddConnectionPanel = () => {
   addConnectionPanel.classList.remove("isOpen");
   addConnectionToggle.setAttribute("aria-expanded", "false");
+  showAddConnectionMessage("");
+};
+const showAddConnectionMessage = (text, isError = false) => {
+  if (!text) {
+    addConnectionMessage.hidden = true;
+    addConnectionMessage.textContent = "";
+    addConnectionMessage.classList.remove("isError", "isSuccess");
+    return;
+  }
+
+  addConnectionMessage.hidden = false;
+  addConnectionMessage.textContent = text;
+  addConnectionMessage.classList.toggle("isError", isError);
+  addConnectionMessage.classList.toggle("isSuccess", !isError);
 };
 const closeDebugPanel = () => {
   debugPanel.classList.remove("isOpen");
@@ -1208,6 +1223,7 @@ addConnectionToggle.addEventListener("click", () => {
   closeSettings();
 
   if (isOpen) {
+    showAddConnectionMessage("");
     renderFriendRequests();
     addConnectionInput.focus();
   }
@@ -1220,13 +1236,15 @@ addConnectionPanel.addEventListener("submit", async (event) => {
     return;
   }
 
+  showAddConnectionMessage("");
   const { error } = await NetworkAPI.sendConnectionRequestByEmail(email);
 
   if (error) {
-    alert(error.message);
+    showAddConnectionMessage(error.message, true);
     return;
   }
 
+  showAddConnectionMessage("Friend request sent.");
   addConnectionInput.value = "";
   addConnectionInput.focus();
 });

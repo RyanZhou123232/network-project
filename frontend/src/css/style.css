@@ -1051,6 +1051,25 @@ body {
   line-height: 1;
 }
 
+.addConnectionMessage {
+  grid-column: 1 / -1;
+  margin: -2px 0 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.addConnectionMessage.isSuccess {
+  color: #c8e6c9;
+  background: rgba(46, 125, 50, 0.28);
+}
+
+.addConnectionMessage.isError {
+  color: #ffcdd2;
+  background: rgba(198, 40, 40, 0.28);
+}
+
 .addConnectionPanel label {
   display: grid;
   gap: 7px;
