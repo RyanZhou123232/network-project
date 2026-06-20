@@ -38,7 +38,16 @@
             <span>Password</span>
             <input type="password" name="password" autocomplete="current-password" />
           </label>
-          <button type="submit" class="loginSubmit">Log in</button>
+          <button type="submit" class="loginSubmit">
+            <span class="loginSubmitText">Log in</span>
+            <span class="authLoader" aria-hidden="true">
+              <svg viewBox="0 0 100 100" fill="none">
+                <g class="authLoaderGroup">
+                  <path class="authLoaderPath" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                </g>
+              </svg>
+            </span>
+          </button>
           <button type="button" class="authGhostButton signUpToggle">Sign Up</button>
         </span>
 

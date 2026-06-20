@@ -8,6 +8,8 @@ const introProgressLine = document.querySelector(".introProgressLine");
 const loginPanel = document.querySelector(".loginPanel");
 const signUpToggle = loginPanel.querySelector(".signUpToggle");
 const signInToggle = loginPanel.querySelector(".signInToggle");
+const loginSubmit = loginPanel.querySelector(".loginSubmit");
+const authLoader = loginSubmit.querySelector(".authLoader");
 const signUpSubmit = loginPanel.querySelector(".signUpSubmit");
 const authSignIn = loginPanel.querySelector(".authSignIn");
 const authSignUp = loginPanel.querySelector(".authSignUp");
@@ -25,6 +27,117 @@ const updateAuthPanelHeight = () => {
   const contentHeight = activeView.offsetHeight + getAuthMessageHeight();
 
   loginPanel.style.setProperty("--auth-height", `${contentHeight}px`);
+};
+const setupRoseLoader = (loader) => {
+  if (!loader) {
+    return;
+  }
+
+  const svgNamespace = "http://www.w3.org/2000/svg";
+  const group = loader.querySelector(".authLoaderGroup");
+  const path = loader.querySelector(".authLoaderPath");
+  const config = {
+    rotate: true,
+    particleCount: 34,
+    trailSpan: 0.31,
+    durationMs: 5300,
+    rotationDurationMs: 28000,
+    pulseDurationMs: 4400,
+    strokeWidth: 5,
+    roseA: 9.2,
+    roseABoost: 0.6,
+    roseBreathBase: 0.72,
+    roseBreathBoost: 0.28,
+    roseScale: 3.25,
+    point(progress, detailScale) {
+      const t = progress * Math.PI * 2;
+      const a = this.roseA + detailScale * this.roseABoost;
+      const r = a * (this.roseBreathBase + detailScale * this.roseBreathBoost) * Math.cos(3 * t);
+
+      return {
+        x: 50 + Math.cos(t) * r * this.roseScale,
+        y: 50 + Math.sin(t) * r * this.roseScale,
+      };
+    },
+  };
+  const normalizeProgress = (progress) => ((progress % 1) + 1) % 1;
+  const getDetailScale = (time) => {
+    const pulseProgress = (time % config.pulseDurationMs) / config.pulseDurationMs;
+    const pulseAngle = pulseProgress * Math.PI * 2;
+
+    return 0.52 + ((Math.sin(pulseAngle + 0.55) + 1) / 2) * 0.48;
+  };
+  const getRotation = (time) =>
+    config.rotate ? -((time % config.rotationDurationMs) / config.rotationDurationMs) * 360 : 0;
+  const buildPath = (detailScale, steps = 160) =>
+    Array.from({ length: steps + 1 }, (_, index) => {
+      const point = config.point(index / steps, detailScale);
+
+      return `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+    }).join(" ");
+  const getParticle = (index, progress, detailScale) => {
+    const tailOffset = index / (config.particleCount - 1);
+    const point = config.point(normalizeProgress(progress - tailOffset * config.trailSpan), detailScale);
+    const fade = Math.pow(1 - tailOffset, 0.56);
+
+    return {
+      x: point.x,
+      y: point.y,
+      radius: 1.2 + fade * 3,
+      opacity: 0.08 + fade * 0.92,
+    };
+  };
+  const particles = Array.from({ length: config.particleCount }, () => {
+    const circle = document.createElementNS(svgNamespace, "circle");
+
+    circle.setAttribute("fill", "currentColor");
+    group.appendChild(circle);
+
+    return circle;
+  });
+  const renderFrame = (time) => {
+    const progress = (time % config.durationMs) / config.durationMs;
+    const detailScale = getDetailScale(time);
+
+    group.setAttribute("transform", `rotate(${getRotation(time)} 50 50)`);
+    path.setAttribute("stroke-width", String(config.strokeWidth));
+    path.setAttribute("d", buildPath(detailScale));
+    particles.forEach((node, index) => {
+      const particle = getParticle(index, progress, detailScale);
+
+      node.setAttribute("cx", particle.x.toFixed(2));
+      node.setAttribute("cy", particle.y.toFixed(2));
+      node.setAttribute("r", particle.radius.toFixed(2));
+      node.setAttribute("opacity", particle.opacity.toFixed(3));
+    });
+  };
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    renderFrame(0);
+    return;
+  }
+
+  const startedAt = performance.now();
+  const render = (now) => {
+    renderFrame(now - startedAt);
+    requestAnimationFrame(render);
+  };
+
+  requestAnimationFrame(render);
+};
+setupRoseLoader(authLoader);
+let authLoading = false;
+const setAuthLoading = (isLoading) => {
+  authLoading = isLoading;
+  loginPanel.classList.toggle("isAuthLoading", isLoading);
+  loginPanel.setAttribute("aria-busy", String(isLoading));
+  loginPanel.querySelectorAll("button, input").forEach((control) => {
+    control.disabled = isLoading;
+  });
+
+  if (!isLoading) {
+    setAuthMode(loginPanel.classList.contains("isSignUp") ? "signup" : "signin");
+  }
 };
 const friendRequestList = document.getElementById("friendRequestList");
 const centerSize = 132;
@@ -1922,18 +2035,33 @@ sortControl.addEventListener("focusout", (event) => {
 });
 loginPanel.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  if (authLoading) {
+    return;
+  }
+
   const email = loginPanel.querySelector("[name='username']").value.trim();
   const password = loginPanel.querySelector("[name='password']").value;
 
   showAuthMessage("");
-  const { error } = await NetworkAPI.signIn(email, password);
+  setAuthLoading(true);
 
-  if (error) {
-    showAuthMessage(error.message, true);
-    return;
+  try {
+    const { error } = await NetworkAPI.signIn(email, password);
+
+    if (error) {
+      showAuthMessage(error.message, true);
+      return;
+    }
+
+    await launchApp();
+  } catch (error) {
+    showAuthMessage(error.message || "Could not sign in.", true);
+  } finally {
+    if (!appStarted) {
+      setAuthLoading(false);
+    }
   }
-
-  await launchApp();
 });
 const setAuthMode = (mode) => {
   const isSignUp = mode === "signup";
@@ -1951,6 +2079,7 @@ const setAuthMode = (mode) => {
 };
 const signOut = async () => {
   await NetworkAPI.signOut();
+  setAuthLoading(false);
   myUserId = null;
   appStarted = false;
   stopPanInertia();
